@@ -3,31 +3,35 @@
 namespace App\Services;
 
 use App\Models\Product;
-use App\Models\ProductCategoryDiscount;
+use App\Services\Discounts\CategoryDiscount;
+use App\Services\Discounts\CustomerDiscount;
+use App\Services\Discounts\Discountable;
 use Illuminate\Support\Facades\Auth;
 
 class DiscountService {
 
     public function getDiscountedPrice(Product $product): float {
        
+        // Dynamically determine applicable discounts
+        $discountables = [
+            new CategoryDiscount($product->product_category_id),
+            new CustomerDiscount(Auth::user()),
+        ];
+
+        // $totalDiscountPercent = 0;
+
         $price = $product->price;
-        
-        // Category discount
-        $discount = ProductCategoryDiscount::where('product_category_id', $product->product_category_id)
-        ->whereDate('start_date', '<=', now())
-        ->whereDate('end_date', '>=', now())
-        ->value('discount');
-        
-        if ($discount) {
-            $price -= $price * $discount;
+
+        foreach ($discountables as $discountable) {
+            $discountPercentage = $discountable->getDiscountPercentage();
+            // $totalDiscountPercent += $discountPercentage;
+
+            // Cumulative discount calculation
+            $price -= $price * $discountPercentage / 100;
         }
-        
-        // Special discount
-        if (Auth::user()->is_special_customer) {
-            // The 10% can be added to the database as in case of a discount amount change, it can be changed by an admin user
-            $price -= $price * 0.10;
-        }
-        
+
+        // // Not used - Combined discount calculation
+        // $discountedPrice = $product->price * (1 - $totalDiscountPercent / 100);
         return round($price, 2);
 
     }
