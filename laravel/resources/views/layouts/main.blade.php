@@ -19,11 +19,11 @@
             <ul class="navbar-nav ms-auto">
 
                 @auth
-                    @if(Auth::user()->role === 'admin')
+                    <!-- @if(Auth::user()->role === 'admin')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url('/products') }}">Edit Products</a>
                         </li>
-                    @endif
+                    @endif -->
                     
                     <li class="nav-item">
                         <form method="POST" action="{{ route('logout') }}">
