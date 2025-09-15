@@ -1,1 +1,1 @@
-# ecommerce
+Product Inventory System with Basic Pricing Engine
