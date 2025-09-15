@@ -28,7 +28,7 @@
                     <td>{{ $product->description }}</td>
                     <td>{{ $product->category->title ?? '-' }}</td>
                     <td>£{{ number_format($product->price, 2) }}</td>
-                    <td class="text-success">${{ number_format($product->getDiscountedPrice(), 2) }}</td>
+                    <td class="text-success">${{ number_format($product->discounted_price, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>
