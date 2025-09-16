@@ -11,11 +11,9 @@ class DashboardController extends Controller
     public function index(DiscountService $discountService)
     {
         $products = Product::with('category')->paginate(10);
-
-        $products->getCollection()->transform(function ($product) use ($discountService) {
+        foreach ($products as $product) {
             $product->discounted_price = $discountService->getDiscountedPrice($product);
-            return $product;
-        });
+        }
 
         return view('dashboard', compact('products'));
     }
