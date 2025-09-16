@@ -15,9 +15,6 @@
                 <th>Category</th>
                 <th>Base Price</th>
                 <th>Final Price</th>
-                @if(auth()->check() && auth()->user()->role === 'admin')
-                    <th>Actions</th>
-                @endif
             </tr>
         </thead>
         <tbody>

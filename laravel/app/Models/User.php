@@ -47,4 +47,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function discounts()
+    {
+        return $this->morphMany(Discount::class, 'discountable');
+    }
 }

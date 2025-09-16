@@ -3,36 +3,36 @@
 namespace App\Services;
 
 use App\Models\Product;
-use App\Services\Discounts\CategoryDiscount;
-use App\Services\Discounts\CustomerDiscount;
-use App\Services\Discounts\Discountable;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class DiscountService {
-
-    public function getDiscountedPrice(Product $product): float {
-       
-        // Dynamically determine applicable discounts
-        $discountables = [
-            new CategoryDiscount($product->product_category_id),
-            new CustomerDiscount(Auth::user()),
-        ];
-
-        // $totalDiscountPercent = 0;
-
-        $price = $product->price;
-
-        foreach ($discountables as $discountable) {
-            $discountPercentage = $discountable->getDiscountPercentage();
-            // $totalDiscountPercent += $discountPercentage;
-
-            // Cumulative discount calculation
-            $price -= $price * $discountPercentage / 100;
+    
+    public function getDiscountedPrice(Product $product, User $customer): float
+    {
+        $finalPrice = $product->price;
+        
+        // Apply product discounts
+        foreach ($product->discounts as $discount) {
+            $finalPrice = $this->applyDiscount($finalPrice, $discount);
         }
-
-        // // Not used - Combined discount calculation
-        // $discountedPrice = $product->price * (1 - $totalDiscountPercent / 100);
-        return round($price, 2);
-
+        
+        // Apply category discounts
+        foreach ($product->category->discounts as $discount) {
+            $finalPrice = $this->applyDiscount($finalPrice, $discount);
+        }
+        
+        // Apply customer discounts
+        foreach ($customer->discounts as $discount) {
+            $finalPrice = $this->applyDiscount($finalPrice, $discount);
+        }
+        
+        return $finalPrice;
+    }
+    
+    private function applyDiscount(float $price, $discount): float
+    {
+        $price -= $price * ($discount->percentage / 100);
+        
+        return $price;
     }
 }
